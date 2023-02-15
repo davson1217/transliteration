@@ -23,7 +23,7 @@ window.onload = () => {
 
   sourceInputEl.addEventListener("keyup", (e) => {
     onSourceInputChange(e, sourceInputEl);
-    if (e.key === "Enter") {
+    if (e.keyCode === 13) {
       onTransliterateClick(
         sourceLanguage.value,
         targetLangValue,
