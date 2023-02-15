@@ -1,0 +1,70 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #2d2d2d;
+    color: #fff;
+    height: 100vh;
+}
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+.filter-nav, .transliteration-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.filter-nav {max-height: 50px}
+nav, .transliteration, .result {
+    border: 1px solid #501c1c;
+    width: 80%;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background-color: #501c1c;
+    text-align: center;
+}
+nav label {
+    width: 300px;
+    margin: 0 13px;
+}
+select, input{
+    text-align: center;
+    width: 110px;
+}
+.transliteration-wrapper {margin-top: 20px}
+.transliteration, .result {
+    /*justify-content: flex-start;*/
+    background-color: #2d2d2d;
+    border: none;
+}
+#sourceInput {
+    width: 20%;
+    height: 30px;
+    text-align: left;
+    font-size: 19px;
+    font-family: monospace;
+}
+#sourceInput:focus {
+    outline: none;
+}
+.transliteration button {
+    height: 37px;
+    width: 150px;
+    margin-left: 10px;
+    background-color: #9d4b4b;
+    color: white;
+}
+
+.result {
+    margin-top: 30px;
+}
+
+.result .sourceName, .result .targetValue {
+    color: #4bc6f6;
+}

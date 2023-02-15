@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Algorithms for transliteration of foreign languages to Lithuanian language</title>
+    <link href="styles/index.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+    <section class="filter-nav">
+        <nav>
+            <label for="sourceLang" class="sourceLangLabel">Source
+                <select id="sourceLang">
+                    <option value="yo">Yoruba</option>
+                    <option value="lt">Lithuanian</option>
+                </select>
+            </label>
+
+            <label for="route" class="routeLabel">Route
+                <select id="route">
+                    <option value="direct">Direct</option>
+                    <option value="intermediate">Intermediate</option>
+                </select>
+            </label>
+
+            <label for="routeOptions" class="routeOptionsLabel">Options
+                <select id="routeOptions">
+                    <option value="ipa">I.P.A</option>
+                    <option value="english">English</option>
+                    <option value="georgian">Georgian</option>
+                </select>
+            </label>
+
+            <label for="method" class="methodLabel">Method
+                <select id="method">
+                    <option value="rules">Rule-based</option>
+                    <option value="ml">Machine Learning</option>
+                </select>
+            </label>
+
+            <label for="targetLang" class="targetLangLabel">Target
+                <input type="text" name="target" id="targetLang" disabled value="Lithuanian" autofocus="autofocus">
+            </label>
+        </nav>
+    </section>
+
+    <section class="transliteration-wrapper">
+        <div class="transliteration">
+            <label for="sourceInput" style="margin-right: 10px">Enter Source Noun:</label>
+            <input type="text" name="sourceInput" id="sourceInput">
+            <button>Lithuanize</button>
+        </div>
+        <div class="result">
+            <span class="text" id="text"></span>
+            <span class="sourceName" id="sourceName"></span>
+            is lithuanized as
+            <span class="targetValue" id="targetName"></span>
+        </div>
+    </section>
+
+</div>
+
+<script src="./js/index.js"></script>
+<script src="./js/helpers.js"></script>
+<script src="./js/transliteration/transliterate.js"></script>
+<script src="./js/transliteration/rule-based/yo-lt.js"></script>
+</body>
+</html>
