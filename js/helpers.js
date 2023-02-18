@@ -55,12 +55,14 @@ const onTransliterateClick = (
   route,
   method
 ) => {
-  if (!inputValue) return; //alert(`Enter a ${sourceLangText} proper noun.`);
+  console.log("route", route);
+  if (!inputValue) return;
   if (sourceLang === "yo") {
     if (route === "direct") {
       if (method === "rules") {
         populateYo_LT_Rules()
           .then(() => {
+            console.log("calling here");
             const { transliteration, essentialTheories } =
               processTranscription(inputValue);
             const sl = sourceLang === "yo" ? "Yoruba" : "Lithuanian";
@@ -75,14 +77,21 @@ const onTransliterateClick = (
       }
       return true;
     } else {
+      console.log(sourceLang, targetLang, inputValue, route, method);
       const intermediateOption = document.querySelector("#routeOptions").value;
+      console.log("intermediateOption", intermediateOption);
       if (intermediateOption === "ipa") {
         if (method === "rules") {
-          console.log("Rule based method #IPA");
+          console.log("Rule based method #IPA", inputValue);
+          const tokens = syllabify(inputValue);
+          console.log("tokens", tokens);
         } else {
           console.log("machine learning method #IPA");
         }
+        return true;
       } else if (intermediateOption === "english") {
+        console.log(sourceLang, targetLang, inputValue, route, method);
+        console.log("intermediateOption", intermediateOption);
         if (method === "rules") {
           console.log("Rule based method #English");
           populateRulesYO_EN()
@@ -113,6 +122,9 @@ const onTransliterateClick = (
           console.log("machine learning method #English");
         }
       } else {
+        console.log(sourceLang, targetLang, inputValue, route, method);
+        console.log("intermediateOption", intermediateOption);
+
         if (method === "rules") {
           console.log("Rule based method #Georgian");
           populateRulesGE()
