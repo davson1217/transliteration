@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Syllabify</title>
+    <script src="syllableHelper.js"></script>
+</head>
+<body>
+<script src="./syllableHelper.js" crossorigin="anonymous" charset="UTF-8"></script>
+
+<label for="yorubaWord">Enter a Yoruba word and press <kbd>Enter</kbd> to generate syllable</label>
+<input type="text" id="yorubaWord" autofocus>
+
+<div id="syllableOutput"></div>
+<script>
+    const yorubaInput = document.getElementById('yorubaWord');
+    yorubaInput.addEventListener('keyup', (event) => {
+        if (event.key === 'Enter') {
+            let yorubaWord = yorubaInput.value.toUpperCase();
+            let wordLength = yorubaWord.length;
+
+            if (!yorubaWord) return alert("Enter a word");
+
+            const syllables = [];
+
+            let token = '';
+            const assertSyllable = (syllableStart, syllableEnd) => {
+                token = yorubaWord.slice(syllableStart, syllableEnd);
+                syllables.push(token);
+
+                yorubaWord = yorubaWord.slice(syllableEnd);
+                wordLength = yorubaWord.length;
+
+                const output = document.getElementById('syllableOutput');
+                output.innerText = syllables.toString().replace(/,/g, ' . ') + ` (${syllables.length} syllables)`;
+            }
+
+            for (let i = 0, j = 1; j <= wordLength; j++) {
+                if (isVowelStarter(yorubaWord)) {
+                    if (yoConsonants.includes(yorubaWord[j])) {
+                        //todo: syllabification exception for intaneeti... pls fix
+                        console.log(yorubaWord[j])
+                        assertSyllable( i, j );
+                        i = 0;
+                        j = 1;
+                    }
+                }else {
+                        const isDigraph = yorubaWord.slice(0,2) === yoDigraph;//
+                        if (isDigraph) {
+                            const digraphDeficit = 2;
+                            const wordWithoutDigraph = yorubaWord.slice(digraphDeficit);
+                            if (wordWithoutDigraph.length > 1) {
+                                const {consonantIndex, isNasal} = indexAndNasalityOfNextConsonant(wordWithoutDigraph); //to start from vowel
+                                if (isNasal) {
+                                    assertSyllable(i, consonantIndex + (digraphDeficit + 1)); //digraphDeficit + 1 to include consonant value
+                                    i = 0;
+                                    j = 1;
+                                } else {
+                                    assertSyllable(i, consonantIndex + digraphDeficit);
+                                    i = 0;
+                                    j = 1;
+                                }
+                            } else {
+                                assertSyllable(i, yorubaWord.length);
+                                break;
+                            }
+                        } else {
+                            const indexDeficit = 1;
+                            const wordWithoutConsonant = yorubaWord.slice(indexDeficit);
+                            if (wordWithoutConsonant.length > 1) {
+                                const {consonantIndex, isNasal} = indexAndNasalityOfNextConsonant(wordWithoutConsonant, indexDeficit);
+                                if (consonantIndex) {
+                                    if (isNasal) {
+                                        assertSyllable(i, consonantIndex + (indexDeficit + 1)); // + 1 to include consonant value
+                                        i = 0;
+                                        j = 1;
+                                    } else {
+
+                                        assertSyllable(i, consonantIndex + indexDeficit);
+                                        i = 0;
+                                        j = 1;
+                                    }
+                                } else assertSyllable(i, yorubaWord.length);
+                            } else {
+                                assertSyllable(i, j);
+                                break;
+                            }
+                        }
+                }
+                if (syllables.toString().replace(/,/g, '').length === yorubaInput.value.length) {
+                    console.log(" ===== finished =====");
+                    break;
+                }
+            }
+
+        }
+    })
+</script>
+</body>
+</html>
