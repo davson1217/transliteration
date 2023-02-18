@@ -62,6 +62,7 @@ function addEntry(
 }
 
 function processTranscription(word, target) {
+  console.log("Made it here", word, RulesEntry)
   const upperCasedWord = word.toUpperCase();
   const essentialTheories = []
   let transliteration = "";
@@ -77,7 +78,7 @@ function processTranscription(word, target) {
   // detectStressAndPrependRule_Yo_EN(word)
   i = 5; //starting from input's actual first character
   j = 0; // searcher (value of j searches )
-
+  console.log("preProcessedInput", preProcessedInput)
   //rules search
   while (i < inputLength + 1) {
     if (RulesEntry[j].currentLetter !== preProcessedInput[i]) {
@@ -123,6 +124,7 @@ function processTranscription(word, target) {
         essentialTheories.push(RulesEntry[j].theory)
       }
       transliteration = transliteration.concat(RulesEntry[j].transliteration);
+      // console.log(transliteration)
       j = 0;
     } else j++;
     if (j > RulesEntry.length - 1) {
@@ -130,7 +132,6 @@ function processTranscription(word, target) {
       i++;
     }
   }
-
   return {
     transliteration,
     essentialTheories

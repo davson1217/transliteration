@@ -16,7 +16,7 @@ function populateYo_LT_Rules() {
     addEntry("", "", "", "A", "Y", "A", "N", "", "", "", "", 3, "O", 1, 1, "Letter A between consonants triggers a nasal vowel /o/ sound as in 'Bran'");
 
     addEntry("", "", "", "", "", "A", "A", "", "", "", "", 3, "", 1, 1);
-    addEntry("", "", "", "", "A", "A", "", "", "", "", "", 3, "Ą", 1, 1, "/AA/ coalesced to form long Lithuanian A");
+    addEntry("", "", "", "", "A", "A", "", "", "", "", "", 3, "Ą", 1, 1, "/AA/ coalesced to form long Lithuanian /A/");
     addEntry("", "", "", "", "", "A", "", "", "", "", "", 3, "A", 1, 1);
     addEntry("", "", "", "", "", "IA", "", "", "", "", "", 3, "JA", 1, 1);
     addEntry("", "", "", "", "", "B", "", "", "", "", "", 3, "B", 1, 1);
@@ -25,11 +25,11 @@ function populateYo_LT_Rules() {
     addEntry("", "", "", "", "I", "E", "", "", "", "", "", 3, "JAI", 1, 1);
     addEntry("", "", "", "", "I", "Ẹ", "", "", "", "", "", 3, "JE", 1, 1);
     addEntry("", "", "", "", "", "Ẹ", "Ẹ", "", "", "", "", 3, "", 1, 1);
-    addEntry("", "", "", "", "Ẹ", "Ẹ", "", "", "", "", "", 3, "Ę", 1, 1);
+    addEntry("", "", "", "", "Ẹ", "Ẹ", "", "", "", "", "", 3, "Ę", 1, 1, "/ẸẸ/ coalesced to form long Lithuanian /Ę/");
     addEntry("", "", "", "", "", "Ẹ", "", "", "", "", "", 3, "E", 1, 1);
     addEntry("", "", "", "", "", "F", "", "", "", "", "", 3, "F", 1, 1);
     addEntry("", "", "", "", "", "G", "", "", "", "", "", 3, "G", 1, 1);
-    addEntry("", "", "", "", "", "GB", "", "", "", "", "", 3, "GB", 1, 1);
+    addEntry("", "", "", "", "", "GB", "", "", "", "", "", 3, "GB", 1, 1, "Learn to pronounce /GB/");
     addEntry("", "", "", "", "", "H", "", "", "", "", "", 3, "H", 1, 1);
     addEntry("", "", "", "", "A", "I", "", "", "", "", "", 3, "JI", 1, 1);
     addEntry("", "", "", "", "", "I", "I", "", "", "", "", 3, "", 1, 1);

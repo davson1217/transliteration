@@ -44,6 +44,10 @@ const onRouteChangeHandler = (event, routeOptions, routeValue) => {
   }
 };
 
+const onRouteOptionChange = (event) => {
+  console.log(event.target.value);
+};
+
 const onTransliterateClick = (
   sourceLang,
   targetLang,
@@ -59,10 +63,8 @@ const onTransliterateClick = (
           .then(() => {
             const { transliteration, essentialTheories } =
               processTranscription(inputValue);
-            if (transliteration) {
-              const sl = sourceLang === "yo" ? "Yoruba" : "Lithuanian";
-              setResultOutput(transliteration, sl, inputValue);
-            }
+            const sl = sourceLang === "yo" ? "Yoruba" : "Lithuanian";
+            setResultOutput(transliteration, sl, inputValue);
           })
           .catch((error) =>
             console.log("Error while transcribing Yoruba to Lithuanian", error)
@@ -75,9 +77,72 @@ const onTransliterateClick = (
     } else {
       const intermediateOption = document.querySelector("#routeOptions").value;
       if (intermediateOption === "ipa") {
+        if (method === "rules") {
+          console.log("Rule based method #IPA");
+        } else {
+          console.log("machine learning method #IPA");
+        }
       } else if (intermediateOption === "english") {
+        if (method === "rules") {
+          console.log("Rule based method #English");
+          populateRulesYO_EN()
+            .then(() => {
+              const { transliteration, essentialTheories } =
+                processTranscription(inputValue);
+              return transliteration;
+            })
+            .then((english) => {
+              console.log("english", english);
+              RulesEntry = [];
+              populateRulesEN_LT();
+
+              return english;
+            })
+            .then((english) => {
+              const { transliteration, essentialTheories } =
+                processTranscription(english);
+            })
+            .catch((error) =>
+              console.log(
+                "Error while transcribing English to Lithuanian",
+                error
+              )
+            );
+        } else {
+          //ML
+          console.log("machine learning method #English");
+        }
       } else {
-        // Georgian
+        if (method === "rules") {
+          console.log("Rule based method #Georgian");
+          populateRulesGE()
+            .then(() => {
+              const { transliteration, essentialTheories } =
+                processTranscription(inputValue);
+              return transliteration;
+            })
+            .then((georgian) => {
+              console.log("georgian", georgian);
+              RulesEntry = [];
+              populateRulesGE_LT();
+
+              return georgian;
+            })
+            .then((georgian) => {
+              const { transliteration, essentialTheories } =
+                processTranscription(georgian);
+              console.log("LT transliteration", transliteration);
+            })
+            .catch((error) =>
+              console.log(
+                "Error while transcribing Georgian to Lithuanian",
+                error
+              )
+            );
+        } else {
+          //ML
+          console.log("machine learning method #Georgian");
+        }
       }
     }
   } else {

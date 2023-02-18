@@ -10,12 +10,13 @@ window.onload = () => {
 
   let targetLangValue = targetLanguage.value;
   let routeValue = route.value;
-  let methodValue = methodEl.value;
 
   //  ================
   route.addEventListener("change", (e) =>
     onRouteChangeHandler(e, routeOptions, routeValue)
   );
+
+  routeOptions.addEventListener("change", onRouteOptionChange)
 
   sourceLanguage.addEventListener("change", (e) =>
     onSourceLangChange(e, targetLanguage, route, routeOptions)
@@ -29,7 +30,7 @@ window.onload = () => {
         targetLangValue,
         sourceInputEl.value,
         routeValue,
-        methodValue
+        methodEl.value
       );
     }
   });
@@ -39,8 +40,8 @@ window.onload = () => {
       sourceLanguage.value,
       targetLangValue,
       sourceInputEl.value,
-      routeValue,
-      methodValue
+      route.value,
+      methodEl.value
     )
   );
 
