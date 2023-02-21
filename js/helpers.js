@@ -77,14 +77,14 @@ const onTransliterateClick = (
       }
       return true;
     } else {
-      console.log(sourceLang, targetLang, inputValue, route, method);
       const intermediateOption = document.querySelector("#routeOptions").value;
-      console.log("intermediateOption", intermediateOption);
       if (intermediateOption === "ipa") {
         if (method === "rules") {
-          console.log("Rule based method #IPA", inputValue);
           const tokens = syllabify(inputValue);
-          console.log("tokens", tokens);
+          if (tokens.length) {
+            const sourceIPA = mapTokensToIPA(tokens);
+            console.log(tokens, sourceIPA.trim())
+          } else alert(`something went wrong whilst tokenizing '${inputValue}'`);
         } else {
           console.log("machine learning method #IPA");
         }
