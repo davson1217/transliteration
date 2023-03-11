@@ -12,7 +12,7 @@ function populateYo_LT_Rules() {
     addEntry("", "", "", "", "S", "A", "N", "", "", "", "", 3, "O", 1, 1, "Letter A between consonants triggers a nasal vowel /o/ sound as in 'Bran'");
     addEntry("", "", "", "", "Ṣ", "A", "N", "", "", "", "", 3, "O", 1, 1, "Letter A between consonants triggers a nasal vowel /o/ sound as in 'Bran'");
     addEntry("", "", "", "", "T", "A", "N", "", "", "", "", 3, "O", 1, 1, "Letter A between consonants triggers a nasal vowel /o/ sound as in 'Bran'");
-    addEntry("", "", "", "A", "Y", "A", "N", "N", "", "", "", 3, "A", 1, 1, "");
+    addEntry("", "", "", "A", "Y", "A", "N", "N", "", "", "", 3, "O", 1, 1, "Letter A between consonants 'Y' and 'N' triggers a nasal vowel /o/ sound as in 'Bran'");
     addEntry("", "", "", "A", "Y", "A", "N", "", "", "", "", 3, "O", 1, 1, "Letter A between consonants triggers a nasal vowel /o/ sound as in 'Bran'");
 
     addEntry("", "", "", "", "", "A", "A", "", "", "", "", 3, "", 1, 1);

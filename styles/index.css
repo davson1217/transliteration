@@ -19,14 +19,14 @@ html, body {
 
 .filter-nav {max-height: 50px}
 nav, .transliteration, .result {
-    border: 1px solid #501c1c;
+    /*border: 1px solid #501c1c;*/
     width: 80%;
     height: 30px;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 10px;
-    background-color: #501c1c;
+    /*background-color: #501c1c;*/
     text-align: center;
 }
 nav label {

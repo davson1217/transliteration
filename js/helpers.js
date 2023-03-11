@@ -55,7 +55,6 @@ const onTransliterateClick = (
   route,
   method
 ) => {
-  console.log("route", route);
   if (!inputValue) return;
   if (sourceLang === "yo") {
     if (route === "direct") {
@@ -81,10 +80,10 @@ const onTransliterateClick = (
       if (intermediateOption === "ipa") {
         if (method === "rules") {
           const tokens = syllabify(inputValue);
-          if (tokens.length) {
-            const sourceIPA = mapTokensToIPA(tokens);
-            console.log(tokens, sourceIPA.trim())
-          } else alert(`something went wrong whilst tokenizing '${inputValue}'`);
+          const sourceIPA = mapTokensToIPA(tokens);
+          console.log(tokens, sourceIPA.trim());
+          const targetIPA = map_S_IPA_T_IPA(sourceIPA);
+          console.log("Tipa", targetIPA)
         } else {
           console.log("machine learning method #IPA");
         }
