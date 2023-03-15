@@ -1,13 +1,36 @@
-const setResultOutput = (transcription, sourceLanguage, sourceValue) => {
+const setResultOutput = (
+  transcription,
+  sourceLanguage,
+  sourceValue,
+  method,
+  params
+) => {
   const resultBlock = document.querySelector(".result");
+  const langProcedure = document.querySelector("#langProcedure");
   const textElement = document.getElementById("text");
   const sourceNameElement = document.getElementById("sourceName");
   const targetValue = document.getElementById("targetName");
-
+  const ipaProcedure = document.querySelector("#ipaProcedure");
   resultBlock.style.display = "block";
-  textElement.textContent = `The ${sourceLanguage} name`;
-  sourceNameElement.textContent = `${sourceValue.toUpperCase()}`;
-  targetValue.textContent = `${transcription}`;
+
+  if (method === "ipa") {
+    const { tokens, sipa, tipa, target, execTime } = params;
+    ipaProcedure.style.display = "block";
+    document.getElementById(
+      "syllables"
+    ).textContent = `The source word has ${tokens.length} syllables: ${tokens.toString().replaceAll(",", " - ")}`;
+    document.getElementById("sipa").textContent = `Source IPA:  ${sipa.replace(
+      "s/g",
+      ""
+    )}`;
+    document.getElementById("tipa").textContent = `Target IPA:  ${tipa}`;
+    document.getElementById("tg").textContent = `Target IPA:  ${target.toUpperCase()}`;
+  } else {
+    langProcedure.style.display = "block";
+    textElement.textContent = `The ${sourceLanguage} name`;
+    sourceNameElement.textContent = `${sourceValue.toUpperCase()}`;
+    targetValue.textContent = `${transcription}`;
+  }
 };
 
 const onSourceLangChange = (event, targetLanguage, route, routeOptions) => {
@@ -56,15 +79,20 @@ const onTransliterateClick = (
   method
 ) => {
   if (!inputValue) return;
+  let startTime;
+  let endTime;
   if (sourceLang === "yo") {
+    const sl = sourceLang === "yo" ? "Yoruba" : "Lithuanian";
     if (route === "direct") {
       if (method === "rules") {
+        startTime = performance.now();
         populateYo_LT_Rules()
           .then(() => {
-            console.log("calling here");
             const { transliteration, essentialTheories } =
               processTranscription(inputValue);
-            const sl = sourceLang === "yo" ? "Yoruba" : "Lithuanian";
+            endTime = performance.now();
+            const execTime = endTime - startTime;
+            console.log("Performance", execTime);
             setResultOutput(transliteration, sl, inputValue);
           })
           .catch((error) =>
@@ -79,11 +107,24 @@ const onTransliterateClick = (
       const intermediateOption = document.querySelector("#routeOptions").value;
       if (intermediateOption === "ipa") {
         if (method === "rules") {
+          startTime = performance.now();
           const tokens = syllabify(inputValue);
-          const sourceIPA = mapTokensToIPA(tokens);
-          console.log(tokens, sourceIPA.trim());
-          const targetIPA = map_S_IPA_T_IPA(sourceIPA);
-          console.log("Tipa", targetIPA)
+          const sipa = mapTokensToIPA(tokens);
+          const { tipa, tgIndices } = mapSipaTipa(sipa.TIPAIndices);
+          const target = mapTipaTarget(tgIndices);
+          endTime = performance.now();
+          const execTime = endTime - startTime;
+          // console.log("tokens", tokens);
+          // console.log("SIPA", sipa);
+          // console.log("Tipa", tipa);
+          // console.log("Performance", execTime);
+          setResultOutput("", sl, inputValue, intermediateOption, {
+            sipa: sipa.ipaValues.replace("\s/g", ""),
+            tipa,
+            execTime,
+            tokens,
+            target
+          });
         } else {
           console.log("machine learning method #IPA");
         }
@@ -117,7 +158,6 @@ const onTransliterateClick = (
               )
             );
         } else {
-          //ML
           console.log("machine learning method #English");
         }
       } else {

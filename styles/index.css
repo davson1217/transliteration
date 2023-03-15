@@ -64,7 +64,12 @@ select, input{
 .result {
     margin-top: 30px;
 }
-
+#ipaProcedure ul{
+    list-style: none;
+}
+#ipaProcedure .info {
+    margin: 10px 0;
+}
 .result .sourceName, .result .targetValue {
     color: #4bc6f6;
 }

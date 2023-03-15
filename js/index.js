@@ -7,6 +7,8 @@ window.onload = () => {
   const transliterateBtn = document.querySelector(".transliteration button");
   const methodEl = document.querySelector("#method");
   const resultBlock = document.querySelector(".result");
+  const langProcedure = document.querySelector("#langProcedure");
+  const ipaProcedure = document.querySelector("#ipaProcedure");
 
   let targetLangValue = targetLanguage.value;
   let routeValue = route.value;
@@ -16,7 +18,7 @@ window.onload = () => {
     onRouteChangeHandler(e, routeOptions, routeValue)
   );
 
-  routeOptions.addEventListener("change", onRouteOptionChange)
+  routeOptions.addEventListener("change", onRouteOptionChange);
 
   sourceLanguage.addEventListener("change", (e) =>
     onSourceLangChange(e, targetLanguage, route, routeOptions)
@@ -29,7 +31,7 @@ window.onload = () => {
         sourceLanguage.value,
         targetLangValue,
         sourceInputEl.value,
-        routeValue,
+        route.value,
         methodEl.value
       );
     }
@@ -45,6 +47,8 @@ window.onload = () => {
     )
   );
 
+  ipaProcedure.style.display = "none";
   routeOptions.style.display = "none";
   resultBlock.style.display = "none";
+  langProcedure.style.display = "none";
 };

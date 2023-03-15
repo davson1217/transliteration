@@ -1,7 +1,10 @@
 /*BUGS
-* last character not included in syllable formation. E.g 'adan', 'idan'
+* last character not included in syllable formation. E.g 'adan', 'idan', 'gbaa'
 * issue found
-* */
+**/
+
+// The procedure of breaking down a given Yoruba word into meaningful chunks. Syllables.
+// Returns syllabified word e.g [A, DE, BA, YỌ]
 const syllabify = (word) => {
   console.log("word to syllabify => ", word);
   let yorubaWord = word.toUpperCase();
@@ -23,7 +26,7 @@ const syllabify = (word) => {
     if (isVowelStarter(yorubaWord)) {
       if (yoConsonants.includes(yorubaWord[j])) {
         //todo: syllabification exception for intaneeti... pls fix
-        console.log(yorubaWord[j])
+        console.log(yorubaWord[j]);
         assertSyllable( i, j );
         i = 0;
         j = 1;

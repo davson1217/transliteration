@@ -1,9 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Algorithms for transliteration of foreign languages to Lithuanian language</title>
+    <link href="https://fonts.googleapis.com/css?family=Assistant:300" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Assistant:300&subset=all" rel="stylesheet">
     <link href="styles/index.css" rel="stylesheet">
+<style>
+    html body {
+        font-family: 'Segoe UI, Cambria, Calibri, Arial, Times New Roman, Tahoma or Lucida Sans Unicode';
+        /*font-family: 'Assistant';*/
+        /*font-family: DejaVu Sans, Symbola, Everson Mono, Dingbats, Segoe UI Symbol,*/
+        /*Quivira, SunExt-A, FreeSerif, Universalia, unifont;*/
+    }
+</style>
 </head>
 <body>
 
@@ -52,10 +62,20 @@
             <button>Lithuanize</button>
         </div>
         <div class="result">
-            <span class="text" id="text"></span>
-            <span class="sourceName" id="sourceName"></span>
-            is lithuanized as
-            <span class="targetValue" id="targetName"></span>
+            <div id="langProcedure">
+                <span class="text" id="text"></span>
+                <span class="sourceName" id="sourceName"></span>
+                is lithuanized as
+                <span class="targetValue" id="targetName"></span>
+            </div>
+            <div id="ipaProcedure">
+                <ul>
+                    <li class="info" id="syllables"></li>
+                    <li class="info" id="sipa"></li>
+                    <li class="info" id="tipa"></li>
+                    <li class="info" id="tg"></li>
+                </ul>
+            </div>
         </div>
     </section>
 
