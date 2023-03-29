@@ -16,15 +16,17 @@ const setResultOutput = (
   if (method === "ipa") {
     const { tokens, sipa, tipa, target, execTime } = params;
     ipaProcedure.style.display = "block";
-    document.getElementById(
-      "syllables"
-    ).textContent = `The source word has ${tokens.length} syllables: ${tokens.toString().replaceAll(",", " - ")}`;
+    document.getElementById("syllables").textContent = `The source word has ${
+      tokens.length
+    } syllables: ${tokens.toString().replaceAll(",", " - ")}`;
     document.getElementById("sipa").textContent = `Source IPA:  ${sipa.replace(
       "s/g",
       ""
     )}`;
     document.getElementById("tipa").textContent = `Target IPA:  ${tipa}`;
-    document.getElementById("tg").textContent = `Target IPA:  ${target.toUpperCase()}`;
+    document.getElementById(
+      "tg"
+    ).textContent = `Transcription:  ${target.toUpperCase()}`;
   } else {
     langProcedure.style.display = "block";
     textElement.textContent = `The ${sourceLanguage} name`;
@@ -79,6 +81,7 @@ const onTransliterateClick = (
   method
 ) => {
   if (!inputValue) return;
+  //create error handler on input. e.g throw error if invalid input.
   let startTime;
   let endTime;
   if (sourceLang === "yo") {
@@ -115,15 +118,23 @@ const onTransliterateClick = (
           endTime = performance.now();
           const execTime = endTime - startTime;
           // console.log("tokens", tokens);
-          // console.log("SIPA", sipa);
+          console.log("SIPA", sipa.ipaValues.toUpperCase());
           // console.log("Tipa", tipa);
           // console.log("Performance", execTime);
+          const data = {
+            source_ipa: sipa.ipaValues,
+            target_ipa: tipa,
+            execution_time: execTime,
+            syllables: tokens,
+            transcription: target
+          };
+          setResult(data);
           setResultOutput("", sl, inputValue, intermediateOption, {
-            sipa: sipa.ipaValues.replace("\s/g", ""),
-            tipa,
+            sipa: sipa.ipaValues.replace("s/g", ""), //.toUpperCase(),
+            tipa, //: tipa.toUpperCase(),
             execTime,
             tokens,
-            target
+            target,
           });
         } else {
           console.log("machine learning method #IPA");

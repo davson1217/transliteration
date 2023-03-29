@@ -114,8 +114,8 @@ const ipaAlphaLT = {
   2: "ą",
   3: "b",
   4: "d",
-  5: "ai", // as in pay
-  6: "ai", //as in pain
+  5: "ei", // as in pay
+  6: "ei", //as in pain
   7: "e", // as in pet
   8: "ė", // as in pair
   9: "f",
@@ -131,8 +131,8 @@ const ipaAlphaLT = {
   19: "n",
   20: "u",
   21: "ū",
-  22: "au",
-  23: "au",
+  22: "o",
+  23: "o",
   24: "o",
   25: "o",
   26: "kp",
@@ -154,6 +154,7 @@ const ipaAlphaLT = {
 const isVowelStarter = (word) => yoVowels.includes(word.charAt(0));
 
 const indexAndNasalityOfNextConsonant = (word) => {
+  // console.log("indexAndNasalityOfNextConsonant of => ", word);
   const response = {
     consonantIndex: 0,
     isNasal: false,
@@ -162,12 +163,30 @@ const indexAndNasalityOfNextConsonant = (word) => {
 
   for (let i = 0; i <= word.length; i++) {
     if (yoConsonants.includes(word[i])) {
-      const combo = word[i - 1] + word[i];
+      // const combo = word[i - 1] + word[i];
       response.consonantIndex = i;
-      response.isNasal = nasals.includes(combo); //word[i] === 'N';
-
+      const nasalTester = word.slice(0, i + 1);
+      // console.log("nasalTester", nasalTester);
+      if (nasals.includes(nasalTester.toUpperCase())) {
+        response.isNasal = true;
+        const nextCharacter = word[i + 1];
+        if (yoVowels.includes(nextCharacter) && nextCharacter !== "O") {
+          // ALAO, AKANO, ADIO
+          //e.g., AJ[ANI] should not be considered to have nasal sound because the vowel [I] must be pronounced
+          response.isNasal = false;
+          break;
+        }
+      } else {
+        if (i + 1 >= word.length) {// avoid leaving last character in source word. e,g., Kiniun
+          response.vowelSequence = word.slice(0);
+        } else {
+          response.vowelSequence = word.slice(0, i);
+        }
+      }
       break;
-    } else response.vowelSequence = word;
+    } //else response.vowelSequence = word;
+
+    // console.log(response);
   }
 
   return response;
@@ -186,12 +205,14 @@ const possibleNasalSoundsForToken = (token = "") => {
 
 function getIPAValueAndIndices() {
   let phonemes = [...arguments];
+  console.log("phonemes", phonemes)
   let ipaValues = "";
   let TIPAIndices = "";
   if (phonemes.includes("noSplit")) {
     const token = phonemes.filter((phoneme) => phoneme !== "noSplit");
     token[0].split("").forEach((phoneme) => {
       const [ipa, index] = alphaIPA[phoneme];
+      // console.log("input___", ipa);
       ipaValues += ipa;
       TIPAIndices += ":" + index;
     });
@@ -212,7 +233,6 @@ function getIPAValueAndIndices() {
 // Returns source IPA
 const mapTokensToIPA = (tokens = [""]) => {
   //missing glides detector i.e., iu (iju) in Jamiu.
-  let tokensIPA = "";
   let SIPA = { ipaValues: "", TIPAIndices: "" };
   tokens.forEach((token) => {
     const nasalSounds = possibleNasalSoundsForToken(token);
@@ -224,15 +244,12 @@ const mapTokensToIPA = (tokens = [""]) => {
         const values = getIPAValueAndIndices(digraph, tokenRemainder);
         SIPA.ipaValues = SIPA.ipaValues + values.ipaValues;
         SIPA.TIPAIndices = SIPA.TIPAIndices + values.TIPAIndices;
-        // tokensIPA += alphaIPA[digraph].concat(token.slice(2));
       } else {
         const values = getIPAValueAndIndices(token[0], token.slice(1));
         SIPA.ipaValues = SIPA.ipaValues + values.ipaValues;
         SIPA.TIPAIndices = SIPA.TIPAIndices + values.TIPAIndices;
-        // tokensIPA += alphaIPA[token[0]].concat(alphaIPA[token.slice(1)]);
       }
       SIPA.ipaValues = SIPA.ipaValues + " ";
-      // tokensIPA += " ";
     } else {
       // No Nasals
       if (token.slice(0, 2) === yoDigraph) {
@@ -241,7 +258,6 @@ const mapTokensToIPA = (tokens = [""]) => {
         const values = getIPAValueAndIndices(digraph, tokenRemainder);
         SIPA.ipaValues = SIPA.ipaValues + values.ipaValues;
         SIPA.TIPAIndices = SIPA.TIPAIndices + values.TIPAIndices;
-        // tokensIPA += alphaIPA[digraph].concat(alphaIPA[token.slice(2)]);
       } else {
         const longSoundPattern = /AA|EE|ẸẸ|II|OO|ỌỌ|UU/i;
         const longSoundMatch = longSoundPattern.exec(token.toString());
@@ -249,28 +265,25 @@ const mapTokensToIPA = (tokens = [""]) => {
           const longSound = longSoundMatch[0];
           if (longSoundMatch.index === 0) {
             //token is long vowel as in word AARẸ i.e [AA, RẸ];
+            const tokenRemainder = token.slice(longSound.length);
             const values = getIPAValueAndIndices(longSound);
-            SIPA.ipaValues = SIPA.ipaValues + values.ipaValues;
-            SIPA.TIPAIndices = SIPA.TIPAIndices + values.TIPAIndices;
-            // tokensIPA += alphaIPA[longSound];
+            const remainderValues = getIPAValueAndIndices(tokenRemainder, "noSplit")
+            SIPA.ipaValues = (SIPA.ipaValues + values.ipaValues).concat(remainderValues.ipaValues);
+            console.log("remainderValues", remainderValues)
+            SIPA.TIPAIndices = SIPA.TIPAIndices + values.TIPAIndices.concat(remainderValues.TIPAIndices);
           } else {
             // e.g [BEE] in BEELI
             const values = getIPAValueAndIndices(token[0][0], longSound);
             SIPA.ipaValues = SIPA.ipaValues + values.ipaValues;
             SIPA.TIPAIndices = SIPA.TIPAIndices + values.TIPAIndices;
-            // tokensIPA += alphaIPA[token[0][0]].concat(alphaIPA[longSound]);
           }
         } else {
-          // token.split("").map((char) => {
           const values = getIPAValueAndIndices(token, "noSplit"); //token entities should be treated as one to keep syllable structure in SIPA
           SIPA.ipaValues = SIPA.ipaValues + values.ipaValues;
           SIPA.TIPAIndices = SIPA.TIPAIndices + values.TIPAIndices;
-          // tokensIPA += alphaIPA[char]
-          // });
         }
       }
       SIPA.ipaValues = SIPA.ipaValues + " ";
-      // tokensIPA += " ";
     }
   });
   SIPA.TIPAIndices = SIPA.TIPAIndices.slice(1); // Removing starting ':' added in getIPAValueAndIndices()
