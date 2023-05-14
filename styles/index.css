@@ -73,3 +73,13 @@ select, input{
 .result .sourceName, .result .targetValue {
     color: #4bc6f6;
 }
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th {
+    width: 250px;
+}
+th, td {
+    background-color: #9d4b4b;
+}

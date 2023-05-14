@@ -77,12 +77,11 @@ function processTranscription(word, target) {
   // detectStressAndPrependRule_Yo_EN(word)
   i = 5; //starting from input's actual first character
   j = 0; // searcher (value of j searches )
-  console.log("preProcessedInput", preProcessedInput);
   //rules search
+  // console.log("rules entry before processing", RulesEntry)
   while (i < inputLength + 1) {
     if (RulesEntry[j].currentLetter !== preProcessedInput[i]) {
       //iterate until current rule's current letter === input's current letter
-      //
       j += RulesEntry[j].ruleSkip;
     } else if (
       (RulesEntry[j].LCont5 !== ""
@@ -119,9 +118,9 @@ function processTranscription(word, target) {
       // +1 because indexOf returns -1 when search is not found. For && operation to work, however, indexOf should at least return 0;
       i += RulesEntry[j].ruleSkip;
       if (RulesEntry[j].theory) {
-        console.log(RulesEntry[j].theory);
         essentialTheories.push(RulesEntry[j].theory);
       }
+      // console.log("RulesEntry[j] => ", RulesEntry[j])
       transliteration = transliteration.concat(RulesEntry[j].transliteration);
       // console.log(transliteration)
       j = 0;
@@ -130,6 +129,10 @@ function processTranscription(word, target) {
       j = 0;
       i++;
     }
+  }
+  // console.log("trans__==", transliteration)
+  if (transliteration && yoConsonants.includes(transliteration[transliteration.length - 1])) {
+    transliteration += "AS"
   }
   return {
     transliteration,

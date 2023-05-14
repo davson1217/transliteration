@@ -9,6 +9,7 @@ window.onload = () => {
   const resultBlock = document.querySelector(".result");
   const langProcedure = document.querySelector("#langProcedure");
   const ipaProcedure = document.querySelector("#ipaProcedure");
+  let currentResult = '';
 
   let targetLangValue = targetLanguage.value;
   let routeValue = route.value;

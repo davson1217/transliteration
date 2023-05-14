@@ -12,7 +12,7 @@ const runSyllabification = (word) => {
 
   const syllables = [];
   let token = "";
-  console.log("syllables", syllables);
+  // console.log("syllables", syllables);
 
   const assertSyllable = (syllableStart, syllableEnd) => {
     token = yorubaWord.slice(syllableStart, syllableEnd);

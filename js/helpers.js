@@ -31,6 +31,7 @@ const setResultOutput = (
     langProcedure.style.display = "block";
     textElement.textContent = `The ${sourceLanguage} name`;
     sourceNameElement.textContent = `${sourceValue.toUpperCase()}`;
+    console.log("transcription====>>>", transcription);
     targetValue.textContent = `${transcription}`;
   }
 };
@@ -52,11 +53,16 @@ const onSourceLangChange = (event, targetLanguage, route, routeOptions) => {
 };
 
 const onSourceInputChange = (event, sourceInput) => {
+  console.log("__CHANGE__")
   const { value } = event.target;
   if (/\d/.test(value)) {
     alert("Only alphabets allowed");
     sourceInput.value = "";
     return false;
+  }
+  if (RulesEntry.length) {
+    console.log("__FILLED__")
+    RulesEntry = []
   }
 };
 
@@ -68,11 +74,7 @@ const onRouteChangeHandler = (event, routeOptions, routeValue) => {
     routeOptions.style.display = "none";
   }
 };
-
-const onRouteOptionChange = (event) => {
-  console.log(event.target.value);
-};
-
+const onRouteOptionChange = () => {};
 const onTransliterateClick = (
   sourceLang,
   targetLang,
@@ -80,7 +82,8 @@ const onTransliterateClick = (
   route,
   method
 ) => {
-  if (!inputValue) return;
+  if (!inputValue || inputValue === sessionStorage.getItem("currentResult"))
+    return;
   //create error handler on input. e.g throw error if invalid input.
   let startTime;
   let endTime;
@@ -95,7 +98,6 @@ const onTransliterateClick = (
               processTranscription(inputValue);
             endTime = performance.now();
             const execTime = endTime - startTime;
-            console.log("Performance", execTime);
             setResultOutput(transliteration, sl, inputValue);
           })
           .catch((error) =>
@@ -114,24 +116,25 @@ const onTransliterateClick = (
           const tokens = syllabify(inputValue);
           const sipa = mapTokensToIPA(tokens);
           const { tipa, tgIndices } = mapSipaTipa(sipa.TIPAIndices);
-          const target = mapTipaTarget(tgIndices);
+          let target = mapTipaTarget(tgIndices);
+          console.log("TARGET", target)
+          if (yoConsonants.includes(target[target.length - 1].toUpperCase())) {
+            target += "AS"
+          }
+          sessionStorage.setItem("currentResult", target);
           endTime = performance.now();
           const execTime = endTime - startTime;
-          // console.log("tokens", tokens);
-          console.log("SIPA", sipa.ipaValues.toUpperCase());
-          // console.log("Tipa", tipa);
-          // console.log("Performance", execTime);
           const data = {
-            source_ipa: sipa.ipaValues,
-            target_ipa: tipa,
-            execution_time: execTime,
-            syllables: tokens,
-            transcription: target
+            Source_IPA: sipa.ipaValues,
+            Target_IPA: tipa,
+            Syllables: tokens,
+            Transcription: target,
+            Execution_Time: execTime,
           };
-          setResult(data);
+          // setResult(data, "IPA");
           setResultOutput("", sl, inputValue, intermediateOption, {
-            sipa: sipa.ipaValues.replace("s/g", ""), //.toUpperCase(),
-            tipa, //: tipa.toUpperCase(),
+            sipa: sipa.ipaValues.replace("s/g", ""),
+            tipa,
             execTime,
             tokens,
             target,
@@ -142,7 +145,6 @@ const onTransliterateClick = (
         return true;
       } else if (intermediateOption === "english") {
         console.log(sourceLang, targetLang, inputValue, route, method);
-        console.log("intermediateOption", intermediateOption);
         if (method === "rules") {
           console.log("Rule based method #English");
           populateRulesYO_EN()
@@ -152,7 +154,7 @@ const onTransliterateClick = (
               return transliteration;
             })
             .then((english) => {
-              console.log("english", english);
+              console.log("english transliteration ==>> ", english)
               RulesEntry = [];
               populateRulesEN_LT();
 
@@ -161,6 +163,7 @@ const onTransliterateClick = (
             .then((english) => {
               const { transliteration, essentialTheories } =
                 processTranscription(english);
+              console.log("final transliteration", transliteration)
             })
             .catch((error) =>
               console.log(
@@ -173,10 +176,8 @@ const onTransliterateClick = (
         }
       } else {
         console.log(sourceLang, targetLang, inputValue, route, method);
-        console.log("intermediateOption", intermediateOption);
 
         if (method === "rules") {
-          console.log("Rule based method #Georgian");
           populateRulesGE()
             .then(() => {
               const { transliteration, essentialTheories } =
@@ -184,7 +185,6 @@ const onTransliterateClick = (
               return transliteration;
             })
             .then((georgian) => {
-              console.log("georgian", georgian);
               RulesEntry = [];
               populateRulesGE_LT();
 
@@ -193,7 +193,7 @@ const onTransliterateClick = (
             .then((georgian) => {
               const { transliteration, essentialTheories } =
                 processTranscription(georgian);
-              console.log("LT transliteration", transliteration);
+              setResultOutput(transliteration, sl, inputValue)
             })
             .catch((error) =>
               console.log(
