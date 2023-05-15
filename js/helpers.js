@@ -38,6 +38,7 @@ const setResultOutput = (
 
 const onSourceLangChange = (event, targetLanguage, route, routeOptions) => {
   const sourceLangValue = event.target.value;
+  if (RulesEntry.length) RulesEntry = [];
   if (sourceLangValue === "yo") {
     targetLanguage.value = "Lithuanian";
     route.disabled = false;
@@ -61,7 +62,6 @@ const onSourceInputChange = (event, sourceInput) => {
     return false;
   }
   if (RulesEntry.length) {
-    console.log("__FILLED__")
     RulesEntry = []
   }
 };
@@ -84,7 +84,9 @@ const onTransliterateClick = (
 ) => {
   if (!inputValue || inputValue === sessionStorage.getItem("currentResult"))
     return;
-  //create error handler on input. e.g throw error if invalid input.
+  //create error handler on input.
+  const normalizedInput = inputValue.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  console.log("normalizedInput ==>>", normalizedInput)gg
   let startTime;
   let endTime;
   if (sourceLang === "yo") {
@@ -95,7 +97,7 @@ const onTransliterateClick = (
         populateYo_LT_Rules()
           .then(() => {
             const { transliteration, essentialTheories } =
-              processTranscription(inputValue);
+              processTranscription(normalizedInput);
             endTime = performance.now();
             const execTime = endTime - startTime;
             setResultOutput(transliteration, sl, inputValue);
@@ -113,7 +115,8 @@ const onTransliterateClick = (
       if (intermediateOption === "ipa") {
         if (method === "rules") {
           startTime = performance.now();
-          const tokens = syllabify(inputValue);
+          console.log("input value ___", inputValue)
+          const tokens = syllabify(normalizedInput);
           const sipa = mapTokensToIPA(tokens);
           const { tipa, tgIndices } = mapSipaTipa(sipa.TIPAIndices);
           let target = mapTipaTarget(tgIndices);
@@ -150,7 +153,7 @@ const onTransliterateClick = (
           populateRulesYO_EN()
             .then(() => {
               const { transliteration, essentialTheories } =
-                processTranscription(inputValue);
+                processTranscription(normalizedInput);
               return transliteration;
             })
             .then((english) => {
@@ -164,6 +167,7 @@ const onTransliterateClick = (
               const { transliteration, essentialTheories } =
                 processTranscription(english);
               console.log("final transliteration", transliteration)
+              setResultOutput(transliteration, sl, inputValue, method);
             })
             .catch((error) =>
               console.log(
@@ -181,7 +185,7 @@ const onTransliterateClick = (
           populateRulesGE()
             .then(() => {
               const { transliteration, essentialTheories } =
-                processTranscription(inputValue);
+                processTranscription(normalizedInput);
               return transliteration;
             })
             .then((georgian) => {

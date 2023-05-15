@@ -63,6 +63,7 @@ function addEntry(
 
 function processTranscription(word, target) {
   const upperCasedWord = word.toUpperCase();
+  console.log("word to transliterate", upperCasedWord)
   const essentialTheories = [];
   let transliteration = "";
   let i = 0,
@@ -80,6 +81,7 @@ function processTranscription(word, target) {
   //rules search
   // console.log("rules entry before processing", RulesEntry)
   while (i < inputLength + 1) {
+    console.log("preProcessedInput[i] ==>> ", preProcessedInput[i])
     if (RulesEntry[j].currentLetter !== preProcessedInput[i]) {
       //iterate until current rule's current letter === input's current letter
       j += RulesEntry[j].ruleSkip;
@@ -120,7 +122,7 @@ function processTranscription(word, target) {
       if (RulesEntry[j].theory) {
         essentialTheories.push(RulesEntry[j].theory);
       }
-      // console.log("RulesEntry[j] => ", RulesEntry[j])
+      console.log("RulesEntry[j] => ", RulesEntry[j])
       transliteration = transliteration.concat(RulesEntry[j].transliteration);
       // console.log(transliteration)
       j = 0;
@@ -131,9 +133,7 @@ function processTranscription(word, target) {
     }
   }
   // console.log("trans__==", transliteration)
-  if (transliteration && yoConsonants.includes(transliteration[transliteration.length - 1])) {
-    transliteration += "AS"
-  }
+
   return {
     transliteration,
     essentialTheories,

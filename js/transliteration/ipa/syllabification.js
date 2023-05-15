@@ -9,7 +9,7 @@
 const runSyllabification = (word) => {
   let yorubaWord = word.toUpperCase();
   let wordLength = yorubaWord.length;
-
+console.log("yorubaWord ==>> ", yorubaWord)
   const syllables = [];
   let token = "";
   // console.log("syllables", syllables);
@@ -106,6 +106,7 @@ const runSyllabification = (word) => {
 
 const syllabify = (word) => {
   //Gambari : Ga-n-ba-ri
+  console.log("word", word)
   let wordToSyllabify = word.replace(/ /g, "-");
   const isJointWordNoun = wordToSyllabify.includes("-");
   if (isJointWordNoun) {
