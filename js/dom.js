@@ -32,3 +32,41 @@ const setResult = (data, resultType = "") => {
     }
   }
 };
+
+const visualizeTree = () => {
+  sessionStorage.setItem("image", svg_tree);
+  window.open('/MT/tree.html','_blank', 'width=800, height=1000');
+}
+
+const renderDecisionTreePrediction = (result) => {
+  console.log("renderDecisionTreePrediction", result)
+  document.querySelector(".result").style.display = "block";
+
+  const mlWrapper = document.querySelector("#machineLearningResult");
+
+  //Depth
+  const depthNode = document.createElement('p')
+  const depthText = document.createTextNode(`Tree Depth: ${result.depth}`);
+  depthNode.appendChild(depthText)
+  //Prediction
+  const predictionNode = document.createElement('p')
+  const predictionText = document.createTextNode(`Prediction: ${result.prediction}`);
+  predictionNode.appendChild(predictionText)
+  //Leaves
+  const leavesNode = document.createElement('p')
+  const leavesText = document.createTextNode(`Decision Leaves: ${result.leaves}`);
+  leavesNode.appendChild(leavesText)
+  // Viz Button
+  const vizBtn = document.createElement('button')
+  const btnText = document.createTextNode("Visualize Tree");
+  vizBtn.appendChild(btnText)
+  vizBtn.addEventListener('click', visualizeTree)
+
+  //Append Nodes to ML result placeholder
+  mlWrapper.appendChild(predictionNode)
+  mlWrapper.appendChild(depthNode)
+  mlWrapper.appendChild(leavesNode)
+  mlWrapper.appendChild(vizBtn)
+
+
+}

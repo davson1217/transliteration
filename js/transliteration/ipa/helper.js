@@ -154,173 +154,194 @@ const ipaAlphaLT = {
 const isVowelStarter = (word) => yoVowels.includes(word.charAt(0));
 
 const indexAndNasalityOfNextConsonant = (word) => {
-  // console.log("indexAndNasalityOfNextConsonant of => ", word);
-  const response = {
-    consonantIndex: 0,
-    isNasal: false,
-    vowelSequence: "",
-  };
+  try {
+    const response = {
+      consonantIndex: 0,
+      isNasal: false,
+      vowelSequence: "",
+    };
 
-  for (let i = 0; i <= word.length; i++) {
-    if (yoConsonants.includes(word[i])) {
-      // const combo = word[i - 1] + word[i];
-      response.consonantIndex = i;
-      const nasalTester = word.slice(0, i + 1);
-      // console.log("nasalTester", nasalTester);
-      if (nasals.includes(nasalTester.toUpperCase())) {
-        response.isNasal = true;
-        const nextCharacter = word[i + 1];
-        if (yoVowels.includes(nextCharacter) && nextCharacter !== "O") {
-          // ALAO, AKANO, ADIO
-          //e.g., AJ[ANI] should not be considered to have nasal sound because the vowel [I] must be pronounced
-          response.isNasal = false;
-          break;
-        }
-      } else {
-        if (i + 1 >= word.length) {// avoid leaving last character in source word. e,g., Kiniun
-          response.vowelSequence = word.slice(0);
+    for (let i = 0; i <= word.length; i++) {
+      if (yoConsonants.includes(word[i])) {
+        // const combo = word[i - 1] + word[i];
+        response.consonantIndex = i;
+        const nasalTester = word.slice(0, i + 1);
+        // console.log("nasalTester", nasalTester);
+        if (nasals.includes(nasalTester.toUpperCase())) {
+          response.isNasal = true;
+          const nextCharacter = word[i + 1];
+          if (yoVowels.includes(nextCharacter) && nextCharacter !== "O") {
+            // ALAO, AKANO, ADIO
+            //e.g., AJ[ANI] should not be considered to have nasal sound because the vowel [I] must be pronounced
+            response.isNasal = false;
+            break;
+          }
         } else {
-          response.vowelSequence = word.slice(0, i);
+          if (i + 1 >= word.length) {// avoid leaving last character in source word. e,g., Kiniun
+            response.vowelSequence = word.slice(0);
+          } else {
+            response.vowelSequence = word.slice(0, i);
+          }
         }
-      }
-      break;
-    } //else response.vowelSequence = word;
+        break;
+      } //else response.vowelSequence = word;
 
-    // console.log(response);
+      // console.log(response);
+    }
+
+    return response;
+  }catch (e) {
+    console.log("error caught in 'indexAndNasalityOfNextConsonant':", e)
   }
-
-  return response;
 };
 
 const possibleNasalSoundsForToken = (token = "") => {
-  return nasalChecker.map((nasal) => {
-    if (token.slice(0, 2) === yoDigraph) {
-      nasal = nasal.replace("_", yoDigraph);
-    } else {
-      nasal = nasal.replace("_", token[0]);
-    }
-    return nasal;
-  });
+  try {
+    return nasalChecker.map((nasal) => {
+      if (token.slice(0, 2) === yoDigraph) {
+        nasal = nasal.replace("_", yoDigraph);
+      } else {
+        nasal = nasal.replace("_", token[0]);
+      }
+      return nasal;
+    });
+  }catch (e) {
+    console.log("error caught in 'possibleNasalSoundsForToken': ", e)
+  }
 };
 
 function getIPAValueAndIndices() {
-  let phonemes = [...arguments];
-  console.log("phonemes", phonemes)
-  let ipaValues = "";
-  let TIPAIndices = "";
-  if (phonemes.includes("noSplit")) {
-    const token = phonemes.filter((phoneme) => phoneme !== "noSplit");
-    token[0].split("").forEach((phoneme) => {
-      const [ipa, index] = alphaIPA[phoneme];
-      // console.log("input___", ipa);
-      ipaValues += ipa;
-      TIPAIndices += ":" + index;
-    });
-  } else {
-    phonemes.forEach((phoneme) => {
-      const [ipa, index] = alphaIPA[phoneme];
-      ipaValues += ipa;
-      TIPAIndices += ":" + index;
-    });
+  try {
+    let phonemes = [...arguments];
+    // console.log("phonemes", phonemes)
+    let ipaValues = "";
+    let TIPAIndices = "";
+    if (phonemes.includes("noSplit")) {
+      const token = phonemes.filter((phoneme) => phoneme !== "noSplit");
+      token[0].split("").forEach((phoneme) => {
+        const [ipa, index] = alphaIPA[phoneme];
+        ipaValues += ipa;
+        TIPAIndices += ":" + index;
+      });
+    } else {
+      phonemes.forEach((phoneme) => {
+        const [ipa, index] = alphaIPA[phoneme];
+        ipaValues += ipa;
+        TIPAIndices += ":" + index;
+      });
 
-    TIPAIndices += " ";
+      TIPAIndices += " ";
+    }
+
+    return { ipaValues, TIPAIndices };
+  }catch (e) {
+    alert("ERR_GLY: glyph with incorrect unicode detected")
   }
-
-  return { ipaValues, TIPAIndices };
 }
 
 // The procedure of converting source syllables to their IPA equivalent. i.e., SG -> SIPA.
 // Returns source IPA
 const mapTokensToIPA = (tokens = [""]) => {
-  //missing glides detector i.e., iu (iju) in Jamiu.
-  let SIPA = { ipaValues: "", TIPAIndices: "" };
-  tokens.forEach((token) => {
-    const nasalSounds = possibleNasalSoundsForToken(token);
-    if (nasalSounds.includes(token)) {
-      // e.g GBAN, KAN
-      if (token.slice(0, 2) === yoDigraph) {
-        const digraph = token.slice(0, 2);
-        const tokenRemainder = token.slice(2);
-        const values = getIPAValueAndIndices(digraph, tokenRemainder);
-        SIPA.ipaValues = SIPA.ipaValues + values.ipaValues;
-        SIPA.TIPAIndices = SIPA.TIPAIndices + values.TIPAIndices;
-      } else {
-        const values = getIPAValueAndIndices(token[0], token.slice(1));
-        SIPA.ipaValues = SIPA.ipaValues + values.ipaValues;
-        SIPA.TIPAIndices = SIPA.TIPAIndices + values.TIPAIndices;
-      }
-      SIPA.ipaValues = SIPA.ipaValues + " ";
-    } else {
-      // No Nasals
-      if (token.slice(0, 2) === yoDigraph) {
-        const digraph = token.slice(0, 2);
-        const tokenRemainder = token.slice(2);
-        const values = getIPAValueAndIndices(digraph, tokenRemainder);
-        SIPA.ipaValues = SIPA.ipaValues + values.ipaValues;
-        SIPA.TIPAIndices = SIPA.TIPAIndices + values.TIPAIndices;
-      } else {
-        const longSoundPattern = /AA|EE|ẸẸ|II|OO|ỌỌ|UU/i;
-        const longSoundMatch = longSoundPattern.exec(token.toString());
-        if (longSoundMatch) {
-          const longSound = longSoundMatch[0];
-          if (longSoundMatch.index === 0) {
-            //token is long vowel as in word AARẸ i.e [AA, RẸ];
-            const tokenRemainder = token.slice(longSound.length);
-            const values = getIPAValueAndIndices(longSound);
-            const remainderValues = getIPAValueAndIndices(tokenRemainder, "noSplit")
-            SIPA.ipaValues = (SIPA.ipaValues + values.ipaValues).concat(remainderValues.ipaValues);
-            console.log("remainderValues", remainderValues)
-            SIPA.TIPAIndices = SIPA.TIPAIndices + values.TIPAIndices.concat(remainderValues.TIPAIndices);
-          } else {
-            // e.g [BEE] in BEELI
-            const values = getIPAValueAndIndices(token[0][0], longSound);
-            SIPA.ipaValues = SIPA.ipaValues + values.ipaValues;
-            SIPA.TIPAIndices = SIPA.TIPAIndices + values.TIPAIndices;
-          }
+  try {
+    //missing glides detector i.e., iu (iju) in Jamiu.
+    let SIPA = { ipaValues: "", TIPAIndices: "" };
+    tokens.forEach((token) => {
+      const nasalSounds = possibleNasalSoundsForToken(token);
+      if (nasalSounds.includes(token)) {
+        // e.g GBAN, KAN
+        if (token.slice(0, 2) === yoDigraph) {
+          const digraph = token.slice(0, 2);
+          const tokenRemainder = token.slice(2);
+          const values = getIPAValueAndIndices(digraph, tokenRemainder);
+          SIPA.ipaValues = SIPA.ipaValues + values.ipaValues;
+          SIPA.TIPAIndices = SIPA.TIPAIndices + values.TIPAIndices;
         } else {
-          const values = getIPAValueAndIndices(token, "noSplit"); //token entities should be treated as one to keep syllable structure in SIPA
+          const values = getIPAValueAndIndices(token[0], token.slice(1));
           SIPA.ipaValues = SIPA.ipaValues + values.ipaValues;
           SIPA.TIPAIndices = SIPA.TIPAIndices + values.TIPAIndices;
         }
+        SIPA.ipaValues = SIPA.ipaValues + " ";
+      } else {
+        // No Nasals
+        if (token.slice(0, 2) === yoDigraph) {
+          const digraph = token.slice(0, 2);
+          const tokenRemainder = token.slice(2);
+          const values = getIPAValueAndIndices(digraph, tokenRemainder);
+          SIPA.ipaValues = SIPA.ipaValues + values.ipaValues;
+          SIPA.TIPAIndices = SIPA.TIPAIndices + values.TIPAIndices;
+        } else {
+          const longSoundPattern = /AA|EE|ẸẸ|II|OO|ỌỌ|UU/i;
+          const longSoundMatch = longSoundPattern.exec(token.toString());
+          if (longSoundMatch) {
+            const longSound = longSoundMatch[0];
+            if (longSoundMatch.index === 0) {
+              //token is long vowel as in word AARẸ i.e [AA, RẸ];
+              const tokenRemainder = token.slice(longSound.length);
+              const values = getIPAValueAndIndices(longSound);
+              const remainderValues = getIPAValueAndIndices(tokenRemainder, "noSplit")
+              SIPA.ipaValues = (SIPA.ipaValues + values.ipaValues).concat(remainderValues.ipaValues);
+              console.log("remainderValues", remainderValues)
+              SIPA.TIPAIndices = SIPA.TIPAIndices + values.TIPAIndices.concat(remainderValues.TIPAIndices);
+            } else {
+              // e.g [BEE] in BEELI
+              const values = getIPAValueAndIndices(token[0][0], longSound);
+              SIPA.ipaValues = SIPA.ipaValues + values.ipaValues;
+              SIPA.TIPAIndices = SIPA.TIPAIndices + values.TIPAIndices;
+            }
+          } else {
+            const values = getIPAValueAndIndices(token, "noSplit"); //token entities should be treated as one to keep syllable structure in SIPA
+            SIPA.ipaValues = SIPA.ipaValues + values.ipaValues;
+            SIPA.TIPAIndices = SIPA.TIPAIndices + values.TIPAIndices;
+          }
+        }
+        SIPA.ipaValues = SIPA.ipaValues + " ";
       }
-      SIPA.ipaValues = SIPA.ipaValues + " ";
-    }
-  });
-  SIPA.TIPAIndices = SIPA.TIPAIndices.slice(1); // Removing starting ':' added in getIPAValueAndIndices()
+    });
+    SIPA.TIPAIndices = SIPA.TIPAIndices.slice(1); // Removing starting ':' added in getIPAValueAndIndices()
 
-  return SIPA;
+    return SIPA;
+  }catch (e) {
+    console.log("error caught in 'mapTokensToIPA': ", e)
+  }
 };
 
 const mapSipaTipa = (tipaIndices = "") => {
-  tipaIndices = tipaIndices.trim();
-  const indices = tipaIndices.split(" ").map((jointIndices) => {
-    if (jointIndices.indexOf(":") === 0) {
-      jointIndices = jointIndices.slice(1);
-    }
+  try {
+    tipaIndices = tipaIndices.trim();
+    const indices = tipaIndices.split(" ").map((jointIndices) => {
+      if (jointIndices.indexOf(":") === 0) {
+        jointIndices = jointIndices.slice(1);
+      }
 
-    return jointIndices;
-  });
-  let tipa = " ";
-  indices.forEach((jointIpa) => {
-    jointIpa.split(":").map((tipaIndex) => {
-      tipa += S_IPA_T_IPA[tipaIndex];
+      return jointIndices;
     });
+    let tipa = " ";
+    indices.forEach((jointIpa) => {
+      jointIpa.split(":").map((tipaIndex) => {
+        tipa += S_IPA_T_IPA[tipaIndex];
+      });
 
-    tipa += " ";
-  });
-  const tgIndices = indices.join(":");
+      tipa += " ";
+    });
+    const tgIndices = indices.join(":");
 
-  return { tipa, tgIndices };
+    return { tipa, tgIndices };
+  }catch (e) {
+   console.log('error caught in "mapSipaTipa":', e)
+  }
 };
 
 const mapTipaTarget = (tipa) => {
-  console.log("tipa to transcribe", tipa);
-  let target = "";
-  // Create indexed YO/IPA -> LT/IPA mapping as exemplified in e.g., S_IPA_T_IPA.
-  // So, this function should receive tipa indices as argument.
-  tipa.split(":").forEach((ipaIndex) => (target += ipaAlphaLT[ipaIndex]));
+  try {
+    let target = "";
+    // Create indexed YO/IPA -> LT/IPA mapping as exemplified in e.g., S_IPA_T_IPA.
+    // So, this function should receive tipa indices as argument.
+    tipa.split(":").forEach((ipaIndex) => (target += ipaAlphaLT[ipaIndex]));
 
-  console.log("final target", target.toUpperCase());
+    console.log("final target", target.toUpperCase());
 
-  return target;
+    return target;
+  }catch (e) {
+    console.log('error caught in "mapTipaTarget":', e)
+  }
 };

@@ -23,7 +23,7 @@
     <section class="filter-nav">
         <nav>
             <label for="sourceLang" class="sourceLangLabel">Source
-                <select id="sourceLang">
+                <select id="sourceLang" disabled>
                     <option value="yo">Yoruba</option>
                     <option value="lt">Lithuanian</option>
                 </select>
@@ -65,10 +65,8 @@
         </div>
         <div class="result">
             <div id="langProcedure">
-                <span class="text" id="text"></span>
-                <span class="sourceName" id="sourceName"></span>
-                is transcribed as
-                <span class="targetValue" id="targetName"></span>
+                <p class="intermediateAdaptation" id="hubAdaptation"></p>
+                <p class="targetValue" id="targetName"></p>
             </div>
             <div id="ipaProcedure">
                 <ul>
@@ -77,6 +75,10 @@
                     <li class="info" id="tipa"></li>
                     <li class="info" id="tg"></li>
                 </ul>
+            </div>
+
+            <div id="machineLearningResult">
+<!--                <button id="viewTree">View Tree</button>-->
             </div>
 
             <table style="width:100%"></table>
@@ -96,5 +98,6 @@
 <script src="./js/transliteration/rule-based/en-lt.js"></script>
 <script src="./js/transliteration/ipa/syllabification.js"></script>
 <script src="js/transliteration/ipa/helper.js"></script>
+<script src="js/http/xhr.js"></script>
 </body>
 </html>

@@ -3,15 +3,30 @@ const setResultOutput = (
   sourceLanguage,
   sourceValue,
   method,
-  params
+  params,
+  clearResults
 ) => {
   const resultBlock = document.querySelector(".result");
   const langProcedure = document.querySelector("#langProcedure");
-  const textElement = document.getElementById("text");
-  const sourceNameElement = document.getElementById("sourceName");
+  const intermediateAdaptation = document.getElementById("hubAdaptation");
   const targetValue = document.getElementById("targetName");
   const ipaProcedure = document.querySelector("#ipaProcedure");
+  let syllables = document.getElementById("syllables");
+  let sipa = document.getElementById("sipa");
+  let tipa = document.getElementById("tipa");
+  let tg = document.getElementById("tg");
   resultBlock.style.display = "block";
+
+  if (clearResults) {
+    targetValue.textContent = '';
+    intermediateAdaptation.textContent = '';
+    syllables.textContent = '';
+    sipa.textContent = '';
+    tipa.textContent = '';
+    tg.textContent = '';
+
+    return
+  }
 
   if (method === "ipa") {
     const { tokens, sipa, tipa, target, execTime } = params;
@@ -29,10 +44,12 @@ const setResultOutput = (
     ).textContent = `Transcription:  ${target.toUpperCase()}`;
   } else {
     langProcedure.style.display = "block";
-    textElement.textContent = `The ${sourceLanguage} name`;
-    sourceNameElement.textContent = `${sourceValue.toUpperCase()}`;
-    console.log("transcription====>>>", transcription);
-    targetValue.textContent = `${transcription}`;
+    if (method !== 'direct') {//i.e., Intermediate Languages
+      intermediateAdaptation.textContent = `${method} adaptation: ${params.hubValue}`;
+      targetValue.textContent = `Final adaptation: ${transcription}`;
+    }else {
+      targetValue.textContent = `${transcription}`;
+    }
   }
 };
 
@@ -67,6 +84,7 @@ const onSourceInputChange = (event, sourceInput) => {
 };
 
 const onRouteChangeHandler = (event, routeOptions, routeValue) => {
+  RulesEntry = [];
   routeValue = event.target.value;
   if (routeValue === "intermediate") {
     routeOptions.style.display = "block";
@@ -75,18 +93,21 @@ const onRouteChangeHandler = (event, routeOptions, routeValue) => {
   }
 };
 const onRouteOptionChange = () => {};
-const onTransliterateClick = (
+const onTransliterateClick = async (
   sourceLang,
   targetLang,
   inputValue,
   route,
   method
 ) => {
-  if (!inputValue || inputValue === sessionStorage.getItem("currentResult"))
-    return;
+  if (!inputValue || inputValue === sessionStorage.getItem("currentResult")) return;
+  RulesEntry = [];
+  setResultOutput('','','','',{}, true)
   //create error handler on input.
-  const normalizedInput = inputValue.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  console.log("normalizedInput ==>>", normalizedInput)gg
+  // const normalizedInput = inputValue.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const glyph = /[\u0300-\u036f]/g;
+  const normalizedInput = inputValue.replaceAll(glyph, '');
+  console.log("normalizedInput ==>>", normalizedInput);
   let startTime;
   let endTime;
   if (sourceLang === "yo") {
@@ -100,14 +121,19 @@ const onTransliterateClick = (
               processTranscription(normalizedInput);
             endTime = performance.now();
             const execTime = endTime - startTime;
-            setResultOutput(transliteration, sl, inputValue);
+            setResultOutput(transliteration, sl, inputValue, 'direct');
           })
           .catch((error) =>
             console.log("Error while transcribing Yoruba to Lithuanian", error)
           );
         return;
       } else {
-        // call ml direct yoruba to LT function
+        console.log("=====Direct Route | Machine Learning ====")
+        if (document.querySelector("#machineLearningResult p")) {
+          return
+        }
+        const response = await httpRequest({name: normalizedInput}, 'direct');
+        renderDecisionTreePrediction(response)
       }
       return true;
     } else {
@@ -149,15 +175,17 @@ const onTransliterateClick = (
       } else if (intermediateOption === "english") {
         console.log(sourceLang, targetLang, inputValue, route, method);
         if (method === "rules") {
-          console.log("Rule based method #English");
+          let englishAdaptation = ''
           populateRulesYO_EN()
             .then(() => {
               const { transliteration, essentialTheories } =
                 processTranscription(normalizedInput);
+              englishAdaptation = transliteration;
+
               return transliteration;
             })
             .then((english) => {
-              console.log("english transliteration ==>> ", english)
+              console.log("english transliteration ==>> ", englishAdaptation)
               RulesEntry = [];
               populateRulesEN_LT();
 
@@ -167,7 +195,7 @@ const onTransliterateClick = (
               const { transliteration, essentialTheories } =
                 processTranscription(english);
               console.log("final transliteration", transliteration)
-              setResultOutput(transliteration, sl, inputValue, method);
+              setResultOutput(transliteration, sl, inputValue, 'English', {hubValue: englishAdaptation});
             })
             .catch((error) =>
               console.log(
@@ -179,6 +207,7 @@ const onTransliterateClick = (
           console.log("machine learning method #English");
         }
       } else {
+        console.log("___Georgian___")
         console.log(sourceLang, targetLang, inputValue, route, method);
 
         if (method === "rules") {
@@ -186,18 +215,22 @@ const onTransliterateClick = (
             .then(() => {
               const { transliteration, essentialTheories } =
                 processTranscription(normalizedInput);
+              RulesEntry = [];
+
               return transliteration;
             })
             .then((georgian) => {
-              RulesEntry = [];
               populateRulesGE_LT();
+
+              console.log("georgian transliteration__", georgian);
 
               return georgian;
             })
             .then((georgian) => {
               const { transliteration, essentialTheories } =
-                processTranscription(georgian);
-              setResultOutput(transliteration, sl, inputValue)
+                processTranscription(georgian, 'Georgian');
+              console.log("transliteration__", transliteration)
+              setResultOutput(transliteration, sl, inputValue,'Georgian', {hubValue: georgian})
             })
             .catch((error) =>
               console.log(
