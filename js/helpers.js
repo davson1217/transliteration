@@ -128,12 +128,16 @@ const onTransliterateClick = async (
           );
         return;
       } else {
-        console.log("=====Direct Route | Machine Learning ====")
-        if (document.querySelector("#machineLearningResult p")) {
-          return
-        }
+        console.log("=====Direct Route | Machine Learning ====");
+        let previousPrediction = document.querySelector("#machineLearningResult #_prediction")?.innerHTML;
+        updateUIForRequest(null, null, Boolean(previousPrediction));
         const response = await httpRequest({name: normalizedInput}, 'direct');
-        renderDecisionTreePrediction(response)
+        if (response?.prediction) {
+          updateUIForRequest(response.prediction);
+          renderDecisionTreePrediction(response, previousPrediction)
+        }else {
+          updateUIForRequest(null, true);
+        }
       }
       return true;
     } else {

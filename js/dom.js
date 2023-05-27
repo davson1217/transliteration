@@ -38,26 +38,34 @@ const visualizeTree = () => {
   window.open('/MT/tree.html','_blank', 'width=800, height=1000');
 }
 
-const renderDecisionTreePrediction = (result) => {
-  console.log("renderDecisionTreePrediction", result)
+const renderDecisionTreePrediction = (result, previousPrediction = "") => {
   document.querySelector(".result").style.display = "block";
 
   const mlWrapper = document.querySelector("#machineLearningResult");
-
+  if (previousPrediction) {
+    document.getElementById("_prediction").innerHTML = `Prediction: ${result.prediction}`;
+    document.getElementById("_depthNode").innerHTML = `Tree Depth: ${result.depth}`;
+    document.getElementById("_leavesNode").innerHTML = `Decision Leaves: ${result.leaves}`;
+    return
+  }
   //Depth
   const depthNode = document.createElement('p')
+  depthNode.setAttribute("id", "_depthNode")
   const depthText = document.createTextNode(`Tree Depth: ${result.depth}`);
-  depthNode.appendChild(depthText)
+  depthNode.appendChild(depthText);
   //Prediction
   const predictionNode = document.createElement('p')
+  predictionNode.setAttribute("id", "_prediction");
   const predictionText = document.createTextNode(`Prediction: ${result.prediction}`);
-  predictionNode.appendChild(predictionText)
+  predictionNode.appendChild(predictionText);
   //Leaves
   const leavesNode = document.createElement('p')
+  leavesNode.setAttribute("id", "_leavesNode");
   const leavesText = document.createTextNode(`Decision Leaves: ${result.leaves}`);
-  leavesNode.appendChild(leavesText)
+  leavesNode.appendChild(leavesText);
   // Viz Button
-  const vizBtn = document.createElement('button')
+  const vizBtn = document.createElement('button');
+  vizBtn.setAttribute("id", "_vizBtn")
   const btnText = document.createTextNode("Visualize Tree");
   vizBtn.appendChild(btnText)
   vizBtn.addEventListener('click', visualizeTree)
@@ -67,6 +75,28 @@ const renderDecisionTreePrediction = (result) => {
   mlWrapper.appendChild(depthNode)
   mlWrapper.appendChild(leavesNode)
   mlWrapper.appendChild(vizBtn)
+}
 
+const updateUIForRequest = (prediction, error, previousPrediction) => {
+  // hide previous result on screen if there is one
+  if (previousPrediction) {
+    document.getElementById("_prediction").style.display = 'none';
+    document.getElementById("_depthNode").style.display = 'none';
+    document.getElementById("_leavesNode").style.display = 'none';
+    // document.getElementById("_vizBtn").style.display = 'none';
+  }else {
+    if (document.getElementById("_prediction"))document.getElementById("_prediction").style.display = 'block';
+    if (document.getElementById("_depthNode"))document.getElementById("_depthNode").style.display = 'block';
+    if (document.getElementById("_leavesNode"))document.getElementById("_leavesNode").style.display = 'block';
+    // if (document.getElementById("_vizBtn"))document.getElementById("_vizBtn").style.display = 'block';
+  }
 
+  if (prediction) {
+    document.querySelector("#machineLearningResult #loading").style.display = 'none'
+    return;
+  }else if (error) {
+    document.querySelector("#machineLearningResult #loading").textContent= 'The CART server could not process a prediction'
+    return;
+  }
+  document.querySelector("#machineLearningResult #loading").style.display = 'block'
 }
